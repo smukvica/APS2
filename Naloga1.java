@@ -86,8 +86,10 @@ public class Naloga1{
 				ms(tabela, 0, tabela.length - 1, smer, true);
 				break;
 			case "cs":
+				cs(tabela, smer);
 				break;
 			case "rs":
+				rs(tabela, smer);
 				break;
         }
     }
@@ -221,10 +223,6 @@ public class Naloga1{
 				a = ms(tabela, 0, tabela.length - 1, !smer, false);
 				System.out.printf("%d %d\n", a[0], a[1]);
 				break;
-			case "cs":
-				break;
-			case "rs":
-				break;
         }
     }
 
@@ -275,10 +273,10 @@ public class Naloga1{
             tabela[index] = najmanjsi;
             stPrirejanj += 3;
         }else{
-            int najvecji = tabela[0];
-            int indexNajvecjega = 0;
+            int najvecji = tabela[index];
+            int indexNajvecjega = index;
             for(int i = index + 1; i < tabela.length; i++){
-                if(tabela[i] > najvecji){
+                if(tabela[i] > tabela[indexNajvecjega]){
                     najvecji = tabela[i];
                     indexNajvecjega = i;
                 }
@@ -312,7 +310,7 @@ public class Naloga1{
 			}
 			tabela[i + 1] = vrednost;
 		}else{
-			while(i >= 0 && tabela[i] < vrednost){
+			while(i >= 0){
 				if(tabela[i] < vrednost){
 					tabela[i + 1] = tabela[i];
 					stPrirejanj += 3;
@@ -322,8 +320,6 @@ public class Naloga1{
 				}
 				stPrimerjav++;
 				i--;
-
-
 			}
 			tabela[i + 1] = vrednost;
 		}
@@ -653,6 +649,106 @@ public class Naloga1{
 	// merge sort functions ----------------------------------------------------
 
 	// counting sort functions -------------------------------------------------
+	private static void cs(int[] tabela, boolean smer){
+		int[] stevilo = prestejElemente(tabela, smer);
+		stevilo = izracunKumulative(stevilo);
+		printTabela(stevilo, 0, stevilo.length);
+		System.out.printf("\n");
+		tabela = countSort(tabela, stevilo);
+		printTabela(tabela, 0, tabela.length);
+		System.out.printf("\n");
+	}
 
+	private static int[] prestejElemente(int[] tabela, boolean smer){
+		int[] a = new int[256];
+		for(int i = 0; i < tabela.length; i++){
+			if(smer){
+				a[tabela[i]]++;
+			}else{
+				a[255 - tabela[i]]++;
+			}
+		}
+		return a;
+	}
+
+	private static int[] izracunKumulative(int[] tabela){
+		int temp = tabela[0];
+		for(int i = 1; i < tabela.length; i++){
+			tabela[i] += temp;
+			temp = tabela[i];
+		}
+		return tabela;
+	}
+
+	private static int[] countSort(int[] tabela, int[] stevilo){
+		int[] urejena = new int[tabela.length];
+		for(int i = tabela.length - 1; i >= 0; i--){
+			int a = tabela[i];
+			int index = --stevilo[a];
+			urejena[index] = a;
+			System.out.printf("%d ", index);
+		}
+		System.out.printf("\n");
+		return urejena;
+	}
 	// counting sort functions -------------------------------------------------
+
+	// radix sort functions ----------------------------------------------------
+
+	private static void rs(int[] tabela, boolean smer){
+		for(int i = 0; i < 4; i++){
+			tabela = radix(tabela, i, smer);
+		}
+	}
+
+	private static int[] radix(int[] tabela, int bit, boolean smer){
+		int[] indexi = new int[256];
+		indexi = izracunIndexov(tabela, bit, smer);
+		indexi = kumulativa(indexi);
+		printTabela(indexi, 0, indexi.length);
+		System.out.printf("\n");
+		tabela = sortiraj(tabela, indexi, bit);
+		printTabela(tabela, 0, tabela.length);
+		System.out.printf("\n");
+		return tabela;
+	}
+
+	private static int[] izracunIndexov(int[] tabela, int bit, boolean smer){
+		int[] a = new int[256];
+		for(int i = 0; i < tabela.length; i++){
+			if(smer){
+				a[getBit(tabela[i], bit)]++;
+			}else{
+				a[256 - getBit(tabela[i], bit)]++;
+			}
+		}
+		return a;
+	}
+
+	private static int getBit(int a, int n){
+		return (int)((a >>> (n * 8)) & 0b11111111);
+	}
+
+	private static int[] kumulativa(int[] a){
+		int temp = a[0];
+		for(int i = 1; i < a.length; i++){
+			a[i] += temp;
+			temp = a[i];
+		}
+		return a;
+	}
+
+	private static int[] sortiraj(int[] tabela, int[] indexi, int bit){
+		int[] urejena = new int[tabela.length];
+		for(int i = tabela.length - 1; i >= 0; i--){
+			int a = tabela[i];
+			int index = --indexi[getBit(a, bit)];
+			urejena[index] = a;
+			System.out.printf("%d ", index);
+		}
+		System.out.printf("\n");
+		return urejena;
+	}
+
+	// radix sort functions ----------------------------------------------------
 }
